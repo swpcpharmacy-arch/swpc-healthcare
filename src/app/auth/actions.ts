@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string;
@@ -48,11 +49,17 @@ export async function registerAction(formData: FormData) {
 
   const supabase = await createClient();
 
+  const headersList = await headers();
+  const host = headersList.get('host') || 'swpc-healthcare.vercel.app';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
+
   // 1. Sign up user
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         full_name: fullName,
         role,
