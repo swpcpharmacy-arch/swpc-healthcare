@@ -28,8 +28,10 @@ CREATE TABLE medication_errors (
   reporter_id UUID REFERENCES profiles(id) NOT NULL,
   report_date DATE DEFAULT CURRENT_DATE NOT NULL,
   patient_hn TEXT,
+  drug_name TEXT,
   error_type TEXT NOT NULL, -- e.g., 'Prescribing', 'Dispensing', 'Administration'
-  severity TEXT NOT NULL, -- e.g., 'A', 'B', 'C', 'D'
+  severity TEXT NOT NULL, -- e.g., 'A', 'B', 'C', 'D' to 'I'
+  contributing_factor TEXT,
   description TEXT NOT NULL,
   actions_taken TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
@@ -97,6 +99,7 @@ CREATE POLICY "Pharmacists can update evaluation criteria" ON evaluation_criteri
 -- Policies for medication_errors
 CREATE POLICY "Staff can report ME" ON medication_errors FOR INSERT WITH CHECK (auth.uid() = reporter_id);
 CREATE POLICY "Staff can view their own reports" ON medication_errors FOR SELECT USING (auth.uid() = reporter_id OR (SELECT role FROM profiles WHERE id = auth.uid()) = 'pharmacist');
+CREATE POLICY "Users and Pharmacists can delete ME" ON medication_errors FOR DELETE USING (auth.uid() = reporter_id OR (SELECT role FROM profiles WHERE id = auth.uid()) = 'pharmacist');
 
 -- Policies for unsafe_products
 CREATE POLICY "Anyone logged in can view unsafe products" ON unsafe_products FOR SELECT USING (auth.role() = 'authenticated');

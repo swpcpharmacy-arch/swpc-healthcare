@@ -198,12 +198,15 @@ export default async function DashboardPage() {
             </Link>
 
             {/* Card 2: Medication Errors */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
+            <Link 
+              href="/me"
+              className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <AlertCircle className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-lg text-slate-800">
+                <h3 className="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition-colors">
                   ระบบรายงาน ME
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -214,7 +217,7 @@ export default async function DashboardPage() {
                 <span>จัดการรายงาน ME</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </Link>
 
             {/* Card 3: Unsafe Products */}
             <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">

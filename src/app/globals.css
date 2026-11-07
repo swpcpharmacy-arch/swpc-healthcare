@@ -26,3 +26,25 @@ body {
     @apply bg-white text-primary border-2 border-primary px-6 py-3 rounded-full font-semibold transition-all hover:bg-primary/5 active:scale-95 shadow-md;
   }
 }
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt;
+  }
+
+  header, nav, footer, button, .print\\:hidden {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
