@@ -45,15 +45,25 @@ export default async function DashboardPage() {
     profile = data;
   }
 
-  // If user is not yet approved, strictly redirect to pending screen
-  if (!profile || profile.status !== 'approved') {
+  const email = profile?.email || user?.email || 'user@hospital.moph.go.th';
+  const isNetworkAdmin = email.trim().toLowerCase() === 'swpc.pharmacy@gmail.com';
+
+  // If user is not yet approved (and not the network admin), strictly redirect to pending screen
+  if (!isNetworkAdmin && (!profile || profile.status !== 'approved')) {
     redirect('/pending-approval');
   }
 
-  const role = profile?.role || user?.user_metadata?.role || 'staff';
+  // Ensure network admin is always pharmacist and approved
+  if (isNetworkAdmin && user && (profile?.status !== 'approved' || profile?.role !== 'pharmacist')) {
+    await supabase
+      .from('profiles')
+      .update({ status: 'approved', role: 'pharmacist' })
+      .eq('id', user.id);
+  }
+
+  const role = isNetworkAdmin ? 'pharmacist' : (profile?.role || user?.user_metadata?.role || 'staff');
   const fullName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'บุคลากรสาธารณสุข';
   const hospitalName = profile?.hospital_name || user?.user_metadata?.hospital_name || 'เครือข่ายบริการสุขภาพอำเภอสวรรคโลก';
-  const email = profile?.email || user?.email || 'user@hospital.moph.go.th';
 
   // If pharmacist, fetch all profiles for approval management
   let allProfiles: any[] = [];

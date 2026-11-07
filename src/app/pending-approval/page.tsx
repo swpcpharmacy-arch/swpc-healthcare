@@ -32,15 +32,23 @@ export default async function PendingApprovalPage() {
     .eq('id', user.id)
     .single();
 
-  // If already approved, direct straight to dashboard
-  if (profile?.status === 'approved') {
+  const email = profile?.email || user?.email || '';
+  const isNetworkAdmin = email.trim().toLowerCase() === 'swpc.pharmacy@gmail.com';
+
+  // If already approved or is network admin, update and direct straight to dashboard
+  if (profile?.status === 'approved' || isNetworkAdmin) {
+    if (isNetworkAdmin && profile?.status !== 'approved') {
+      await supabase
+        .from('profiles')
+        .update({ status: 'approved', role: 'pharmacist' })
+        .eq('id', user.id);
+    }
     redirect('/dashboard');
   }
 
   const fullName = profile?.full_name || user?.user_metadata?.full_name || 'ผู้ใช้งาน';
   const role = profile?.role || user?.user_metadata?.role || 'staff';
   const hospitalName = profile?.hospital_name || user?.user_metadata?.hospital_name || 'รพ.สต. ในเครือข่าย';
-  const email = profile?.email || user?.email;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50/50 via-teal-50/30 to-cyan-50 flex flex-col justify-between p-6">
