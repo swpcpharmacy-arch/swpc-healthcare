@@ -45,8 +45,8 @@ export default async function DashboardPage() {
     profile = data;
   }
 
-  // If user is pending approval, redirect to pending screen
-  if (profile && profile.status === 'pending') {
+  // If user is not yet approved, strictly redirect to pending screen
+  if (!profile || profile.status !== 'approved') {
     redirect('/pending-approval');
   }
 

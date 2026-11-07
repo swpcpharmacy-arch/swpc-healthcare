@@ -31,18 +31,16 @@ export async function loginAction(formData: FormData) {
     .eq('id', authData.user.id)
     .single();
 
-  if (profile) {
-    if (profile.status === 'rejected') {
+  if (!profile || profile.status !== 'approved') {
+    if (profile?.status === 'rejected') {
       await supabase.auth.signOut();
       return { 
         success: false, 
         error: 'บัญชีนี้ไม่ได้รับการอนุมัติการเข้าใช้งาน โปรดติดต่อเภสัชกรผู้ดูแลระบบเครือข่าย' 
       };
     }
-
-    if (profile.status === 'pending') {
-      redirect('/pending-approval');
-    }
+    // Any status other than 'approved' goes to pending screen
+    redirect('/pending-approval');
   }
 
   redirect(redirectTo);
@@ -94,15 +92,10 @@ export async function registerAction(formData: FormData) {
   }
 
   if (authData.user) {
-    // Check if this is the very first user in the system or admin email
-    const { count } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-
-    // The first user ever created or network admin email is automatically approved
-    const isFirstUser = count === null || count === 0;
+    // Only designated system admin email is auto-approved.
+    // Everyone else (Staff & Pharmacists) is strictly 'pending' and requires admin approval.
     const isNetworkAdmin = email.toLowerCase() === 'swpc.pharmacy@gmail.com';
-    const status = (isFirstUser || isNetworkAdmin) ? 'approved' : 'pending';
+    const status = isNetworkAdmin ? 'approved' : 'pending';
 
     // 2. Insert into profiles table
     const { error: profileError } = await supabase.from('profiles').upsert({
