@@ -73,13 +73,19 @@ INSERT INTO evaluation_criteria (category, title, points_possible) VALUES
 
 -- Row Level Security (RLS) Policies
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE evaluation_criteria ENABLE ROW LEVEL SECURITY;
 ALTER TABLE medication_errors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE unsafe_products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_documents ENABLE ROW LEVEL SECURITY;
 
 -- Policies for profiles
 CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can insert their own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+
+-- Policies for evaluation_criteria
+CREATE POLICY "Anyone logged in can view evaluation criteria" ON evaluation_criteria FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Pharmacists can update evaluation criteria" ON evaluation_criteria FOR UPDATE USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'pharmacist');
 
 -- Policies for medication_errors
 CREATE POLICY "Staff can report ME" ON medication_errors FOR INSERT WITH CHECK (auth.uid() = reporter_id);
@@ -89,3 +95,8 @@ CREATE POLICY "Staff can view their own reports" ON medication_errors FOR SELECT
 CREATE POLICY "Anyone logged in can view unsafe products" ON unsafe_products FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Staff can report unsafe products" ON unsafe_products FOR INSERT WITH CHECK (auth.uid() = reporter_id);
 CREATE POLICY "Pharmacists can update status" ON unsafe_products FOR UPDATE USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'pharmacist');
+
+-- Policies for evidence_documents
+CREATE POLICY "Anyone logged in can view evidence documents" ON evidence_documents FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Staff can insert evidence documents" ON evidence_documents FOR INSERT WITH CHECK (auth.uid() = staff_id);
+CREATE POLICY "Staff can update own evidence documents" ON evidence_documents FOR UPDATE USING (auth.uid() = staff_id);
