@@ -68,10 +68,14 @@ export default async function DashboardPage() {
   // If pharmacist, fetch all profiles for approval management
   let allProfiles: any[] = [];
   if (role === 'pharmacist') {
-    const { data: usersData } = await supabase
+    const { data: usersData, error: usersError } = await supabase
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false });
+    
+    if (usersError) {
+      console.error('Error fetching profiles for approval:', usersError);
+    }
     allProfiles = usersData || [];
   }
 
