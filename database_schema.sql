@@ -7,6 +7,7 @@ CREATE TABLE profiles (
   email TEXT NOT NULL,
   role TEXT CHECK (role IN ('staff', 'pharmacist')) NOT NULL,
   hospital_name TEXT NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
@@ -82,6 +83,12 @@ ALTER TABLE evidence_documents ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can insert their own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Pharmacists can view all profiles" ON profiles FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'pharmacist' AND status = 'approved')
+);
+CREATE POLICY "Pharmacists can update profiles status" ON profiles FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'pharmacist' AND status = 'approved')
+);
 
 -- Policies for evaluation_criteria
 CREATE POLICY "Anyone logged in can view evaluation criteria" ON evaluation_criteria FOR SELECT USING (auth.role() = 'authenticated');

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { logoutAction } from '@/app/auth/actions';
+import UserApprovalManager from '@/components/admin/UserApprovalManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,10 +45,25 @@ export default async function DashboardPage() {
     profile = data;
   }
 
+  // If user is pending approval, redirect to pending screen
+  if (profile && profile.status === 'pending') {
+    redirect('/pending-approval');
+  }
+
   const role = profile?.role || user?.user_metadata?.role || 'staff';
   const fullName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'บุคลากรสาธารณสุข';
   const hospitalName = profile?.hospital_name || user?.user_metadata?.hospital_name || 'เครือข่ายบริการสุขภาพอำเภอสวรรคโลก';
   const email = profile?.email || user?.email || 'user@hospital.moph.go.th';
+
+  // If pharmacist, fetch all profiles for approval management
+  let allProfiles: any[] = [];
+  if (role === 'pharmacist') {
+    const { data: usersData } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    allProfiles = usersData || [];
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/40">
@@ -222,6 +238,11 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* User Approval Management (For Pharmacists only) */}
+        {role === 'pharmacist' && (
+          <UserApprovalManager initialProfiles={allProfiles} />
+        )}
 
         {/* Profile Details Card */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">

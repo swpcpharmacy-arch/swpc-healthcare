@@ -15,13 +15,34 @@ export async function loginAction(formData: FormData) {
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: authData, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (error) {
+  if (error || !authData.user) {
     return { success: false, error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือยังไม่ได้ยืนยันตัวตน' };
+  }
+
+  // Check user approval status in profiles
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('status, role')
+    .eq('id', authData.user.id)
+    .single();
+
+  if (profile) {
+    if (profile.status === 'rejected') {
+      await supabase.auth.signOut();
+      return { 
+        success: false, 
+        error: 'บัญชีนี้ไม่ได้รับการอนุมัติการเข้าใช้งาน โปรดติดต่อเภสัชกรผู้ดูแลระบบเครือข่าย' 
+      };
+    }
+
+    if (profile.status === 'pending') {
+      redirect('/pending-approval');
+    }
   }
 
   redirect(redirectTo);
@@ -73,6 +94,16 @@ export async function registerAction(formData: FormData) {
   }
 
   if (authData.user) {
+    // Check if this is the very first user in the system or admin email
+    const { count } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+
+    // The first user ever created or network admin email is automatically approved
+    const isFirstUser = count === null || count === 0;
+    const isNetworkAdmin = email.toLowerCase() === 'swpc.pharmacy@gmail.com';
+    const status = (isFirstUser || isNetworkAdmin) ? 'approved' : 'pending';
+
     // 2. Insert into profiles table
     const { error: profileError } = await supabase.from('profiles').upsert({
       id: authData.user.id,
@@ -80,23 +111,59 @@ export async function registerAction(formData: FormData) {
       email,
       role,
       hospital_name: hospitalName,
+      status,
       created_at: new Date().toISOString(),
     });
 
     if (profileError) {
       console.warn('Could not insert profile:', profileError.message);
     }
-  }
 
-  // If session created directly (email confirmation off)
-  if (authData.session) {
-    redirect('/dashboard');
+    // If session created directly (email confirmation off)
+    if (authData.session) {
+      if (status === 'approved') {
+        redirect('/dashboard');
+      } else {
+        redirect('/pending-approval');
+      }
+    }
   }
 
   return { 
     success: true, 
-    message: 'ลงทะเบียนสำเร็จ! หากมีการตั้งค่าเปิดยืนยันอีเมล โปรดตรวจสอบกล่องจดหมายของคุณ' 
+    message: 'ลงทะเบียนสำเร็จ! บัญชีของคุณอยู่ระหว่างรอเภสัชกรผู้ดูแลระบบอนุมัติการเข้าใช้งาน' 
   };
+}
+
+export async function updateUserStatusAction(userId: string, newStatus: 'approved' | 'rejected') {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: 'กรุณาเข้าสู่ระบบก่อน' };
+  }
+
+  // Check if current user is an approved pharmacist
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('role, status')
+    .eq('id', user.id)
+    .single();
+
+  if (currentProfile?.role !== 'pharmacist' || currentProfile?.status !== 'approved') {
+    return { success: false, error: 'คุณไม่มีสิทธิ์ในการอนุมัติผู้ใช้งาน (เฉพาะเภสัชกรที่ได้รับอนุมัติแล้วเท่านั้น)' };
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ status: newStatus })
+    .eq('id', userId);
+
+  if (error) {
+    return { success: false, error: error.message || 'ไม่สามารถอัปเดตสถานะได้' };
+  }
+
+  return { success: true };
 }
 
 export async function logoutAction() {
