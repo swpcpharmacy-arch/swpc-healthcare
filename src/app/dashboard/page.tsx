@@ -176,12 +176,15 @@ export default async function DashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1: Criteria Part 7 */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
+            <Link 
+              href="/criteria"
+              className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                   <ClipboardList className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-lg text-slate-800">
+                <h3 className="font-bold text-lg text-slate-800 group-hover:text-primary transition-colors">
                   เกณฑ์การประเมินส่วนที่ 7
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -192,7 +195,7 @@ export default async function DashboardPage() {
                 <span>เข้าสู่เกณฑ์ประเมิน</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </Link>
 
             {/* Card 2: Medication Errors */}
             <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
