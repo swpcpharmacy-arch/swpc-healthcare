@@ -103,8 +103,10 @@ export default function CriteriaDashboard({
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Top Banner & Breadcrumb */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-600 p-6 sm:p-8 text-white shadow-xl">
+      {/* Screen Interactive Criteria List (Hidden completely on print) */}
+      <div className="screen-only space-y-8 pb-12">
+        {/* Top Banner & Breadcrumb */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-600 p-6 sm:p-8 text-white shadow-xl">
         <div className="absolute right-0 top-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -z-0"></div>
         <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -323,6 +325,7 @@ export default function CriteriaDashboard({
           </button>
         </div>
       )}
+      </div>
 
       {/* Criteria Detail & Edit Modal */}
       <CriteriaDetailModal

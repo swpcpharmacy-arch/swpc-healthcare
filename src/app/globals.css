@@ -71,6 +71,14 @@ body {
     display: none !important;
   }
 
+  /* Reset main container when printing */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
   /* Modal Backdrop Reset */
   .print-modal-backdrop {
     position: static !important;
