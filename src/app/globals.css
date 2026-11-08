@@ -30,27 +30,114 @@ body {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 8mm 10mm 8mm;
+    margin: 12mm 10mm 12mm 10mm;
   }
 
+  /* Reset layout for full page width */
   html, body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-size: 11pt;
-    margin: 0 !important;
-    padding: 0 !important;
     width: 100% !important;
     min-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10pt;
+    line-height: 1.4;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  /* Hide screen-only chrome */
-  header, nav, footer, button, .print-hidden {
+  /* Strictly hide all web chrome, sidebars, navbars, buttons & widgets */
+  header, 
+  nav, 
+  aside, 
+  footer, 
+  button, 
+  input, 
+  select, 
+  textarea,
+  .screen-only, 
+  .no-print, 
+  .print-hidden, 
+  .print\:hidden, 
+  [role="navigation"] {
     display: none !important;
   }
 
+  /* Isolate active print report container: hide background dashboard & main contents */
+  body:has(.print-report-container) main > *:not(:has(.print-report-container)) {
+    display: none !important;
+  }
+
+  /* Modal Backdrop Reset */
+  .print-modal-backdrop {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Report container expands cleanly to full printable A4 paper */
+  .print-report-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Smart table pagination & repeated headers */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Avoid orphaned signatures or summary blocks across page boundaries */
+  .break-inside-avoid,
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Explicit page break helpers */
+  .page-break-before {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  
+  .page-break-after {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
   * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
     box-sizing: border-box !important;
   }
 }

@@ -193,7 +193,7 @@ export default function MEDashboard({
   return (
     <div className="space-y-6">
       {/* Top Banner & Quick Actions */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 p-6 md:p-8 text-white shadow-xl">
+      <div className="screen-only relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 p-6 md:p-8 text-white shadow-xl">
         <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -z-0 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -260,7 +260,7 @@ export default function MEDashboard({
       </div>
 
       {/* Filter Control Bar */}
-      <div className="bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 shadow-sm space-y-3">
+      <div className="screen-only bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 shadow-sm space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
             <Filter className="w-4 h-4 text-teal-600" />
@@ -405,7 +405,7 @@ export default function MEDashboard({
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+      <div className="screen-only flex items-center justify-between border-b border-slate-200/80 pb-3">
         <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
           <button
             onClick={() => setActiveTab('analytics')}

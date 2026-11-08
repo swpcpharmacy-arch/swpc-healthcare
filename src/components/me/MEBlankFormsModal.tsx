@@ -23,9 +23,9 @@ export default function MEBlankFormsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-8 flex items-center justify-center print:static print:p-0 print:bg-transparent print:backdrop-blur-none print:block">
+    <div className="print-modal-backdrop fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-8 flex items-center justify-center">
       {/* Floating Control Bar (Hidden on print) */}
-      <div className="fixed top-4 right-4 z-50 flex flex-wrap items-center gap-3 print:hidden bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-slate-200">
+      <div className="screen-only fixed top-4 right-4 z-50 flex flex-wrap items-center gap-3 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-slate-200">
         {/* Toggle Form Type */}
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
           <button
@@ -72,7 +72,7 @@ export default function MEBlankFormsModal({
 
       {/* Sheet 1: Multi-Incident Form */}
       {formType === 'multi' && (
-        <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-6 md:p-8 text-slate-900 border border-slate-300 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none print:w-full">
+        <div className="print-report-container w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-6 md:p-8 text-slate-900 border border-slate-300">
           {/* Header */}
           <div className="text-center pb-3 border-b-2 border-slate-900 space-y-1">
             <h1 className="text-base md:text-lg font-bold tracking-tight text-slate-900">
@@ -164,7 +164,7 @@ export default function MEBlankFormsModal({
 
       {/* Sheet 2: Single Incident Form */}
       {formType === 'single' && (
-        <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-6 md:p-8 text-slate-900 border border-slate-300 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none print:w-full">
+        <div className="print-report-container w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-6 md:p-8 text-slate-900 border border-slate-300">
           {/* Header */}
           <div className="text-center pb-2 border-b-2 border-slate-900 space-y-0.5">
             <h1 className="text-base md:text-lg font-bold tracking-tight text-slate-900">

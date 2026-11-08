@@ -181,9 +181,9 @@ export default function CriteriaDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="print-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+        className="print-report-container bg-white rounded-3xl shadow-2xl border border-slate-200/80 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
       >
@@ -213,7 +213,7 @@ export default function CriteriaDetailModal({
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition"
+            className="screen-only p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition"
             aria-label="ปิดหน้าต่าง"
           >
             <X className="w-5 h-5" />
@@ -221,7 +221,7 @@ export default function CriteriaDetailModal({
         </div>
 
         {/* Toolbar / Mode switcher */}
-        <div className="px-6 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-xs">
+        <div className="screen-only px-6 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsEditing(false)}
@@ -302,7 +302,7 @@ export default function CriteriaDetailModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:p-6 bg-slate-50/90 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div className="screen-only p-4 sm:p-6 bg-slate-50/90 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}

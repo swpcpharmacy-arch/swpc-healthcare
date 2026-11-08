@@ -50,9 +50,9 @@ export default function MEPrintReport({
   });
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-8 flex items-center justify-center print:static print:p-0 print:bg-transparent print:backdrop-blur-none print:block">
+    <div className="print-modal-backdrop fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-8 flex items-center justify-center">
       {/* Floating Control Bar (Hidden on print) */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2 print:hidden bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-slate-200">
+      <div className="screen-only fixed top-4 right-4 z-50 flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-slate-200">
         <button
           onClick={handlePrint}
           className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-teal-600/30 transition cursor-pointer"
@@ -70,7 +70,7 @@ export default function MEPrintReport({
       </div>
 
       {/* Printable Sheet (Simulated A4 Paper) */}
-      <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 md:p-10 text-slate-800 border border-slate-200 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none print:rounded-none print:w-full">
+      <div className="print-report-container w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 md:p-10 text-slate-800 border border-slate-200">
         {/* Header */}
         <div className="text-center pb-4 border-b-2 border-slate-800 space-y-1">
           <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-900">
