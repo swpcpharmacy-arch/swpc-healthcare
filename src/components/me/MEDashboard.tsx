@@ -25,6 +25,7 @@ import {
   ME_SEVERITY_LEVELS 
 } from '@/lib/constants/me';
 import { HOSPITALS } from '@/lib/constants';
+import { HospitalWithPharmacist } from '@/app/hospitals/actions';
 import MEStatsOverview from './MEStatsOverview';
 import MEIncidentTable from './MEIncidentTable';
 import MEFormModal from './MEFormModal';
@@ -38,6 +39,34 @@ interface MEDashboardProps {
   fullName?: string;
   hospitalName?: string;
   isPharmacist?: boolean;
+  hospitals?: HospitalWithPharmacist[];
+}
+
+// Helper to match hospital names even if one uses short 'รพ.สต.' and another uses 'โรงพยาบาลส่งเสริมสุขภาพตำบล'
+function matchHospital(list: HospitalWithPharmacist[], targetName: string) {
+  if (!targetName || targetName === 'all') return null;
+
+  // 1. Exact match by name, id, or code
+  let match = list.find(
+    (h) => h.name === targetName || h.id === targetName || h.code === targetName
+  );
+  if (match) return match;
+
+  // 2. Fuzzy match by core name
+  const cleanTarget = targetName
+    .replace(/^โรงพยาบาลส่งเสริมสุขภาพตำบล|^รพ\.สต\.|^โรงพยาบาล|^รพ\./g, '')
+    .trim();
+
+  if (cleanTarget) {
+    match = list.find((h) => {
+      const cleanHosp = h.name
+        .replace(/^โรงพยาบาลส่งเสริมสุขภาพตำบล|^รพ\.สต\.|^โรงพยาบาล|^รพ\./g, '')
+        .trim();
+      return cleanHosp === cleanTarget || h.name.includes(cleanTarget) || targetName.includes(cleanHosp);
+    });
+  }
+
+  return match || null;
 }
 
 export default function MEDashboard({
@@ -47,6 +76,7 @@ export default function MEDashboard({
   fullName,
   hospitalName = 'รพ.สต. ในเครือข่าย',
   isPharmacist = false,
+  hospitals = [],
 }: MEDashboardProps) {
   const [activeTab, setActiveTab] = useState<'analytics' | 'incidents'>('analytics');
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -62,14 +92,44 @@ export default function MEDashboard({
   const [selectedStage, setSelectedStage] = useState('all');
   const [selectedSeverityGroup, setSelectedSeverityGroup] = useState<'all' | 'near_miss' | 'no_harm' | 'harm'>('all');
 
+  // Dynamic Hospital List & Pharmacist Assignment
+  const hospitalList = useMemo(() => {
+    if (hospitals && hospitals.length > 0) {
+      return hospitals.filter((h) => h.is_active);
+    }
+    return HOSPITALS.map((h, i) => ({
+      id: h.id,
+      name: h.name,
+      code: h.id,
+      is_active: true,
+      display_order: i + 1,
+      responsible_pharmacist: null,
+      responsible_pharmacist_id: null,
+    }));
+  }, [hospitals]);
+
+  // Compute responsible pharmacist name for the active hospital filter
+  const currentHospitalTarget = isPharmacist ? selectedHospital : hospitalName;
+  const currentResponsiblePharmacistName = useMemo(() => {
+    if (currentHospitalTarget === 'all') return null;
+    const match = matchHospital(hospitalList, currentHospitalTarget);
+    return match?.responsible_pharmacist?.full_name || null;
+  }, [hospitalList, currentHospitalTarget]);
+
   // Filtered Records Calculation
   const filteredRecords = useMemo(() => {
     return initialRecords.filter((item) => {
-      // 1. Hospital Filter (Pharmacist can choose, Staff is locked to their hospital)
+      // 1. Hospital Filter with fuzzy matching support
       if (!isPharmacist) {
-        if (item.hospital_name !== hospitalName) return false;
+        if (item.hospital_name !== hospitalName) {
+          const matchItem = matchHospital(hospitalList, item.hospital_name || '');
+          const matchUser = matchHospital(hospitalList, hospitalName);
+          if (!matchItem || !matchUser || matchItem.id !== matchUser.id) return false;
+        }
       } else if (selectedHospital !== 'all' && item.hospital_name !== selectedHospital) {
-        return false;
+        const matchItem = matchHospital(hospitalList, item.hospital_name || '');
+        const matchSelected = matchHospital(hospitalList, selectedHospital);
+        if (!matchItem || !matchSelected || matchItem.id !== matchSelected.id) return false;
       }
 
       // 2. Search Query
@@ -320,7 +380,7 @@ export default function MEDashboard({
                   className="w-full py-2 px-2.5 rounded-xl border border-slate-300 bg-white text-xs outline-none focus:ring-2 focus:ring-teal-500 font-medium"
                 >
                   <option value="all">ทุกหน่วยบริการในอำเภอสวรรคโลก</option>
-                  {HOSPITALS.map((hosp) => (
+                  {hospitalList.map((hosp) => (
                     <option key={hosp.id} value={hosp.name}>
                       {hosp.name}
                     </option>
@@ -329,6 +389,22 @@ export default function MEDashboard({
               ) : (
                 <div className="w-full py-2 px-3 rounded-xl border border-teal-200 bg-teal-50/60 text-xs text-teal-900 font-bold truncate">
                   {hospitalName}
+                </div>
+              )}
+
+              {/* Supervising Pharmacist Indicator */}
+              {currentHospitalTarget !== 'all' && (
+                <div className="mt-1.5 flex items-center gap-1.5 text-[11px]">
+                  {currentResponsiblePharmacistName ? (
+                    <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200 font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>ผู้ตรวจสอบ: {currentResponsiblePharmacistName}</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic text-[11px] block">
+                      (ยังไม่ได้ระบุเภสัชกรผู้รับผิดชอบ)
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -487,6 +563,7 @@ export default function MEDashboard({
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         reporterName={fullName}
+        responsiblePharmacistName={currentResponsiblePharmacistName}
       />
 
       {/* Modal: Blank Forms for On-Site Recording */}

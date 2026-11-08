@@ -80,6 +80,12 @@ function LoginForm() {
             <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
               รหัสผ่าน (Password)
             </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-primary hover:underline font-medium transition"
+            >
+              ลืมรหัสผ่าน?
+            </Link>
           </div>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { logoutAction } from '@/app/auth/actions';
+import { getHospitalsAction } from '@/app/hospitals/actions';
 import MEDashboard from '@/components/me/MEDashboard';
 import { DEFAULT_ME_RECORDS } from '@/lib/data/defaultMEData';
 import { MedicationErrorRecord } from '@/lib/constants/me';
@@ -52,6 +53,10 @@ export default async function MedicationErrorsPage() {
   const fullName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'บุคลากรสาธารณสุข';
   const hospitalName = profile?.hospital_name || user?.user_metadata?.hospital_name || 'เครือข่ายบริการสุขภาพอำเภอสวรรคโลก';
   const isPharmacist = role === 'pharmacist';
+
+  // Fetch Hospitals list
+  const hospitalsRes = await getHospitalsAction();
+  const hospitals = hospitalsRes.data || [];
 
   // Fetch Medication Errors
   let records: MedicationErrorRecord[] = [];
@@ -183,6 +188,7 @@ export default async function MedicationErrorsPage() {
           fullName={fullName}
           hospitalName={hospitalName}
           isPharmacist={isPharmacist}
+          hospitals={hospitals}
         />
       </main>
     </div>

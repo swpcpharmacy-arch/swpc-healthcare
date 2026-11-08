@@ -15,6 +15,7 @@ interface MEPrintReportProps {
   isOpen: boolean;
   onClose: () => void;
   reporterName?: string;
+  responsiblePharmacistName?: string | null;
 }
 
 export default function MEPrintReport({
@@ -24,6 +25,7 @@ export default function MEPrintReport({
   isOpen,
   onClose,
   reporterName,
+  responsiblePharmacistName,
 }: MEPrintReportProps) {
   if (!isOpen) return null;
 
@@ -96,6 +98,12 @@ export default function MEPrintReport({
               <span className="text-slate-500 block text-[10px]">จำนวนรายการ:</span>
               <strong className="text-slate-900 text-xs">{total} รายการ</strong>
             </div>
+            {responsiblePharmacistName && (
+              <div className="col-span-2 sm:col-span-4 pt-1.5 mt-1 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                <span className="text-slate-500">เภสัชกรผู้รับผิดชอบ (ผู้ตรวจสอบ):</span>
+                <strong className="text-purple-900 font-bold">{responsiblePharmacistName}</strong>
+              </div>
+            )}
           </div>
         </div>
 
@@ -227,8 +235,16 @@ export default function MEPrintReport({
           <div className="space-y-5">
             <p className="text-slate-700">ลงชื่อ.................................................................ผู้ตรวจสอบ</p>
             <div>
-              <p className="font-semibold text-slate-900">(ภญ. ชนัญชิดา ชุ่มใจ หรือผู้แทน)</p>
-              <p className="text-slate-600 mt-1">เภสัชกรชำนาญการ / ผู้รับผิดชอบงานเครือข่ายปฐมภูมิ</p>
+              <p className="font-semibold text-slate-900">
+                {responsiblePharmacistName 
+                  ? `(${responsiblePharmacistName})` 
+                  : '(.................................................................)'}
+              </p>
+              <p className="text-slate-600 mt-1">
+                {responsiblePharmacistName 
+                  ? 'เภสัชกรผู้รับผิดชอบประจำ รพ.สต.' 
+                  : 'เภสัชกรผู้รับผิดชอบงานเครือข่ายปฐมภูมิ'}
+              </p>
               <p className="text-slate-500 mt-1">วันที่ ........ / ........ / ................</p>
             </div>
           </div>

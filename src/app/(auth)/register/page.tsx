@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { UserPlus, Mail, Lock, User, Building2, AlertCircle, CheckCircle2, Shield, Eye, EyeOff } from 'lucide-react';
 import { registerAction } from '@/app/auth/actions';
+import { getHospitalsAction } from '@/app/hospitals/actions';
 import { HOSPITALS, USER_ROLES } from '@/lib/constants';
 
 export default function RegisterPage() {
@@ -11,7 +12,23 @@ export default function RegisterPage() {
   const [selectedRole, setSelectedRole] = useState<'staff' | 'pharmacist'>('staff');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [hospitalOptions, setHospitalOptions] = useState<string[]>(HOSPITALS.map((h) => h.name));
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let isMounted = true;
+    getHospitalsAction().then((res) => {
+      if (isMounted && res.success && res.data && res.data.length > 0) {
+        const activeNames = res.data.filter((h) => h.is_active).map((h) => h.name);
+        if (activeNames.length > 0) {
+          setHospitalOptions(activeNames);
+        }
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -148,9 +165,9 @@ export default function RegisterPage() {
               className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition text-slate-800 text-sm shadow-sm appearance-none"
             >
               <option value="" disabled>-- เลือกหน่วยบริการในอำเภอสวรรคโลก --</option>
-              {HOSPITALS.map((hosp) => (
-                <option key={hosp.id} value={hosp.name}>
-                  {hosp.name}
+              {hospitalOptions.map((name) => (
+                <option key={name} value={name}>
+                  {name}
                 </option>
               ))}
             </select>

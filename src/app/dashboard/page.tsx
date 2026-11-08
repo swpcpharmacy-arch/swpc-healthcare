@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { logoutAction } from '@/app/auth/actions';
+import { getHospitalsAction } from '@/app/hospitals/actions';
 import UserApprovalManager from '@/components/admin/UserApprovalManager';
 
 export const dynamic = 'force-dynamic';
@@ -65,18 +66,22 @@ export default async function DashboardPage() {
   const fullName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'บุคลากรสาธารณสุข';
   const hospitalName = profile?.hospital_name || user?.user_metadata?.hospital_name || 'เครือข่ายบริการสุขภาพอำเภอสวรรคโลก';
 
-  // If pharmacist, fetch all profiles for approval management
+  // If pharmacist, fetch all profiles and hospitals for admin management
   let allProfiles: any[] = [];
+  let allHospitals: any[] = [];
+  let isFallbackHospitals = false;
   if (role === 'pharmacist') {
-    const { data: usersData, error: usersError } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [{ data: usersData, error: usersError }, hospRes] = await Promise.all([
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+      getHospitalsAction(),
+    ]);
     
     if (usersError) {
       console.error('Error fetching profiles for approval:', usersError);
     }
     allProfiles = usersData || [];
+    allHospitals = hospRes.data || [];
+    isFallbackHospitals = !!hospRes.isFallback;
   }
 
   return (
@@ -259,9 +264,13 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* User Approval Management (For Pharmacists only) */}
+        {/* User & Hospital Management (For Pharmacists only) */}
         {role === 'pharmacist' && (
-          <UserApprovalManager initialProfiles={allProfiles} />
+          <UserApprovalManager 
+            initialProfiles={allProfiles} 
+            initialHospitals={allHospitals} 
+            isFallbackHospitals={isFallbackHospitals}
+          />
         )}
 
         {/* Profile Details Card */}
