@@ -196,10 +196,15 @@ export interface MedicationErrorRecord {
   hospital_name?: string;
 }
 
+export type DateFilterMode = 'all' | 'this_month' | 'last_month' | 'quarter' | 'fiscal_year' | 'custom';
+
 export interface MEFilterState {
   searchQuery: string;
-  dateRange: 'all' | 'this_month' | 'last_month' | 'this_year';
+  dateFilterMode: DateFilterMode;
+  customStartDate: string;
+  customEndDate: string;
   hospital: string;
-  errorType: string;
+  stage: string;
   severityGroup: 'all' | 'near_miss' | 'no_harm' | 'harm';
 }
+

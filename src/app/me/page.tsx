@@ -56,11 +56,12 @@ export default async function MedicationErrorsPage() {
   // Fetch Medication Errors
   let records: MedicationErrorRecord[] = [];
 
-  const { data: meData, error: meError } = await supabase
+  let query = supabase
     .from('medication_errors')
     .select(`
       id,
       reporter_id,
+      hospital_name,
       report_date,
       patient_hn,
       drug_name,
@@ -78,6 +79,13 @@ export default async function MedicationErrorsPage() {
     .order('report_date', { ascending: false })
     .order('created_at', { ascending: false });
 
+  // Staff can strictly view only their own hospital
+  if (!isPharmacist) {
+    query = query.eq('hospital_name', hospitalName);
+  }
+
+  const { data: meData, error: meError } = await query;
+
   if (!meError && meData && meData.length > 0) {
     records = meData.map((item: any) => ({
       id: item.id,
@@ -92,11 +100,16 @@ export default async function MedicationErrorsPage() {
       actions_taken: item.actions_taken,
       created_at: item.created_at,
       reporter_name: item.profiles?.full_name || 'เจ้าหน้าที่',
-      hospital_name: item.profiles?.hospital_name || hospitalName,
+      hospital_name: item.hospital_name || item.profiles?.hospital_name || hospitalName,
     }));
   } else {
-    // If table is empty or error/fallback, populate with default seed data
+    // If table is empty or fallback, populate with default seed data
     records = DEFAULT_ME_RECORDS;
+  }
+
+  // Strictly enforce hospital isolation for Staff (including fallback dataset)
+  if (!isPharmacist) {
+    records = records.filter((r) => r.hospital_name === hospitalName);
   }
 
   return (

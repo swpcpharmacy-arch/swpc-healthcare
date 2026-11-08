@@ -26,6 +26,7 @@ CREATE TABLE evaluation_criteria (
 CREATE TABLE medication_errors (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   reporter_id UUID REFERENCES profiles(id) NOT NULL,
+  hospital_name TEXT,
   report_date DATE DEFAULT CURRENT_DATE NOT NULL,
   patient_hn TEXT,
   drug_name TEXT,

@@ -23,7 +23,16 @@ export async function createMedicationErrorAction(
       return { success: false, error: 'กรุณาเข้าสู่ระบบก่อนดำเนินการบันทึกข้อมูล' };
     }
 
-    // 2. Extract fields from formData
+    // 2. Fetch user profile to get hospital_name
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('hospital_name')
+      .eq('id', user.id)
+      .single();
+
+    const hospitalName = profile?.hospital_name || user.user_metadata?.hospital_name || 'รพ.สต. ในเครือข่าย';
+
+    // 3. Extract fields from formData
     const reportDate = formData.get('report_date') as string;
     const patientHn = (formData.get('patient_hn') as string)?.trim() || null;
     const drugName = (formData.get('drug_name') as string)?.trim() || null;
@@ -33,7 +42,7 @@ export async function createMedicationErrorAction(
     const description = (formData.get('description') as string)?.trim();
     const actionsTaken = (formData.get('actions_taken') as string)?.trim() || null;
 
-    // 3. Validation
+    // 4. Validation
     if (!reportDate) {
       return { success: false, error: 'กรุณาระบุวันที่เกิดอุบัติการณ์' };
     }
@@ -47,11 +56,12 @@ export async function createMedicationErrorAction(
       return { success: false, error: 'กรุณากรอกรายละเอียดเหตุการณ์อย่างน้อย 5 ตัวอักษร' };
     }
 
-    // 4. Insert into database
+    // 5. Insert into database
     const { error: insertError } = await supabase
       .from('medication_errors')
       .insert({
         reporter_id: user.id,
+        hospital_name: hospitalName,
         report_date: reportDate,
         patient_hn: patientHn,
         drug_name: drugName,
