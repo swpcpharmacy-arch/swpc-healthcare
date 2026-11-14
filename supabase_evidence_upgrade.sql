@@ -35,8 +35,14 @@ BEGIN
   END IF;
 END $$;
 
+-- Grant table-level permissions to Supabase roles
+GRANT ALL ON TABLE public.evidence_documents TO authenticated, anon, service_role;
+
 -- 3. Enable RLS
 ALTER TABLE evidence_documents ENABLE ROW LEVEL SECURITY;
+
+-- Reload PostgREST schema cache
+NOTIFY pgrst, 'reload schema';
 
 -- Drop previous policies to avoid duplication
 DROP POLICY IF EXISTS "Anyone logged in can view evidence documents" ON evidence_documents;

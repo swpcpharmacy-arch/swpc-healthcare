@@ -33,7 +33,7 @@ export async function getEvidenceDocumentsAction(
       .eq('fiscal_year', fiscalYear);
 
     if (error) {
-      console.error('Error fetching evidence documents:', error);
+      console.error('Error fetching evidence documents:', error.message || error);
       return { data: [], error: error.message };
     }
 
