@@ -225,23 +225,26 @@ export default async function DashboardPage() {
             </Link>
 
             {/* Card 3: Unsafe Products */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
+            <Link 
+              href="/unsafe-products"
+              className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Pill className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-lg text-slate-800">
+                <h3 className="font-bold text-lg text-slate-800 group-hover:text-sky-600 transition-colors">
                   แจ้งผลิตภัณฑ์ไม่ปลอดภัย
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  เฝ้าระวังผลิตภัณฑ์สุขภาพในชุมชน แนบรูปภาพ และติดตามสถานะรับเรื่อง
+                  เฝ้าระวังยาและผลิตภัณฑ์สุขภาพ (G-RDU / G-SHP) บีบอัดรูปภาพอัตโนมัติ และติดตามข้อสั่งการ
                 </p>
               </div>
               <div className="pt-6 flex items-center justify-between text-xs font-semibold text-sky-600">
-                <span>แจ้งผลิตภัณฑ์</span>
+                <span>เข้าสู่ระบบเฝ้าระวัง</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </Link>
 
             {/* Card 4: Evidence Checklist */}
             <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
