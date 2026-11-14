@@ -247,12 +247,15 @@ export default async function DashboardPage() {
             </Link>
 
             {/* Card 4: Evidence Checklist */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group">
+            <Link 
+              href="/evidence"
+              className="glass-card rounded-2xl p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 border border-slate-200/80 bg-white group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <FolderGit2 className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-lg text-slate-800">
+                <h3 className="font-bold text-lg text-slate-800 group-hover:text-indigo-600 transition-colors">
                   คลังเอกสารหลักฐาน
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -260,10 +263,10 @@ export default async function DashboardPage() {
                 </p>
               </div>
               <div className="pt-6 flex items-center justify-between text-xs font-semibold text-indigo-600">
-                <span>ดู Checklist หลักฐาน</span>
+                <span>จัดการหลักฐานนิเทศ</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </Link>
           </div>
         </div>
 
